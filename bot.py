@@ -33,6 +33,7 @@ LINK_PATTERNS = {
     "DOM.RIA": r"/realty-[^?#]*\d+\.html",
     "LUN": r"/realty/\d+",
 }
+LUN_HOSTS = ("lun.ua", "www.lun.ua", "apps.lun.ua")
 # ========================================================
 
 HEADERS = {
@@ -54,6 +55,7 @@ USD_RE1 = re.compile(r"(\d[\d\s\u00a0]*)\s*(?:\$|USD|дол)", re.I)
 USD_RE2 = re.compile(r"\$\s*(\d[\d\s\u00a0]*)")
 UAH_RE = re.compile(r"(\d[\d\s\u00a0]*)\s*(?:грн|₴|UAH)", re.I)
 CITY_RE = re.compile(r"тернопіл|тернопол", re.I)
+LUN_ID_RE = re.compile(r"(?:apps\.lun\.ua/realty/|/realty/)(\d{6,})", re.I)
 
 
 def fetch(url):
@@ -78,50 +80,23 @@ def collect_links(site, url):
     links = []
 
     for a in soup.find_all("a", href=True):
-        href = unquote(a["href"])
-        full = urljoin(url, href).split("#")[0].split("?")[0]
+        full = urljoin(url, unquote(a["href"])).split("#")[0].split("?")[0]
         p = urlparse(full)
-
-        if site == "LUN":
-            allowed_host = p.netloc in ("lun.ua", "www.lun.ua", "apps.lun.ua")
-        else:
-            allowed_host = p.netloc == host
-
-        if allowed_host and pat.search(unquote(p.path)):
+        allowed = p.netloc in LUN_HOSTS if site == "LUN" else p.netloc == host
+        if allowed and pat.search(unquote(p.path)):
+            if site == "LUN":
+                m = LUN_ID_RE.search(full)
+                if m:
+                    full = "https://apps.lun.ua/realty/" + m.group(1)
             links.append(full)
 
-    # LUN може зберігати URL оголошень не у звичайних <a>,
-    # а всередині JavaScript/JSON сторінки.
+    # LUN часто тримає посилання на оголошення всередині JSON/JS сторінки
     if site == "LUN":
-        normalized_html = (
-            html.replace("\\/", "/")
-                .replace("\\u002F", "/")
-                .replace("\\u002f", "/")
-                .replace("&", "&")
-        )
-
-        lun_urls = re.findall(
-            r"https?://apps\.lun\.ua/realty/\d+(?:\?[^\"'<>\s\\]*)?",
-            normalized_html,
-            flags=re.I,
-        )
-
-        for lun_url in lun_urls:
-            clean_url = lun_url.split("#")[0].split("?")[0]
-            links.append(clean_url)
-
-        # Запасний пошук лише за ID оголошень.
-        lun_ids = re.findall(
-            r"(?:apps\.lun\.ua/realty/|/realty/)(\d{6,})",
-            normalized_html,
-            flags=re.I,
-        )
-
-        for listing_id in lun_ids:
-            links.append(f"https://apps.lun.ua/realty/{listing\_id}")
+        norm = html.replace("\\/", "/").replace("\\u002F", "/").replace("\\u002f", "/")
+        for lid in LUN_ID_RE.findall(norm):
+            links.append("https://apps.lun.ua/realty/" + lid)
 
     return list(dict.fromkeys(links))
-
 
 
 def meta(soup, *names):
@@ -176,8 +151,9 @@ def parse(url, rate):
     return {
         "url": url,
         "title": title.strip(),
+        "photo": urljoin(url, meta(soup, "og:image", "twitter:image")) if meta(soup, "og:image", "twitter:image") else "",
         "price": find_price([title, desc] + parts + [body[:3000]], rate),
-        "rooms": find_rooms(title),
+        "rooms": find_rooms(title + " " + desc),
         "no_comm": bool(NO_COMM_RE.search(text)),
         "bad_repair": bool(BAD_REPAIR_RE.search(text)),
         "repair": bool(GOOD_REPAIR_RE.search(text)) and not BAD_REPAIR_RE.search(text),
@@ -207,8 +183,26 @@ def message(site, it):
     return f"{head} · {site}\n{price}{rooms} · {repair}\n{it['title']}\n{it['url']}"
 
 
+def send_photo(photo, caption):
+    """Надсилає фото з підписом. Якщо фото не вдалося — звичайне повідомлення."""
+    token, chat = os.environ["TELEGRAM_TOKEN"].strip(), os.environ["TELEGRAM_CHAT_ID"].strip()
+    if photo:
+        try:
+            r = requests.post(
+                f"https://api.telegram.org/bot{token}/sendPhoto",
+                json={"chat_id": chat, "photo": photo, "caption": caption[:1024]},
+                timeout=30,
+            )
+            if r.ok:
+                return
+            print(f"  фото не надіслалось ({r.status_code}), шлю текстом")
+        except Exception as e:
+            print(f"  фото не надіслалось ({e}), шлю текстом")
+    send(caption)
+
+
 def send(text):
-    token, chat = os.environ["TELEGRAM_TOKEN"], os.environ["TELEGRAM_CHAT_ID"]
+    token, chat = os.environ["TELEGRAM_TOKEN"].strip(), os.environ["TELEGRAM_CHAT_ID"].strip()
     r = requests.post(
         f"https://api.telegram.org/bot{token}/sendMessage",
         json={"chat_id": chat, "text": text, "disable_web_page_preview": False},
@@ -223,8 +217,9 @@ def load_state():
             s = json.load(f)
         s.setdefault("seen", {})
         s.setdefault("fails", {})
+        s.setdefault("sites", [])
         return s
-    return {"seen": {}, "fails": {}}
+    return {"seen": {}, "fails": {}, "sites": []}
 
 
 def save_state(state):
@@ -258,10 +253,15 @@ def main():
             continue
 
         print(f"{site}: знайдено посилань на оголошення: {len(links)}")
+        # Сайт, який вперше дав результати, просто запам'ятовуємо без розсилки
+        site_first = first or (links and site not in state["sites"])
+        if links and site not in state["sites"]:
+            state["sites"].append(site)
+
         for link in links:
             if link in state["seen"]:
                 continue
-            if first:
+            if site_first:
                 state["seen"][link] = now
                 continue
             if fetched >= MAX_NEW_PER_RUN:
@@ -287,7 +287,7 @@ def main():
         send(f"✅ Бот запущено. Поточні оголошення ({len(state['seen'])}) запам'ятав, надсилатиму тільки нові.")
     queue.sort(key=lambda x: not x[1]["no_comm"])  # без комісії першими
     for site, item in queue:
-        send(message(site, item))
+        send_photo(item.get("photo"), message(site, item))
         time.sleep(1)
     save_state(state)
 
