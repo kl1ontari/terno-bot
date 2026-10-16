@@ -31,7 +31,7 @@ STATE_FILE = "seen.json"
 LINK_PATTERNS = {
     "OLX": r"/d/(uk/)?obyavlenie/",
     "DOM.RIA": r"/realty-[^?#]*\d+\.html",
-    "LUN": r"оренд[^?#]*\d{4,}",
+    "LUN": r"/realty/\d+",
 }
 # ========================================================
 
@@ -71,16 +71,57 @@ def usd_rate():
 
 
 def collect_links(site, url):
-    soup = BeautifulSoup(fetch(url), "lxml")
+    html = fetch(url)
+    soup = BeautifulSoup(html, "lxml")
     host = urlparse(url).netloc
-    pat = re.compile(LINK_PATTERNS[site])
+    pat = re.compile(LINK_PATTERNS[site], re.I)
     links = []
+
     for a in soup.find_all("a", href=True):
-        full = urljoin(url, a["href"]).split("#")[0].split("?")[0]
+        href = unquote(a["href"])
+        full = urljoin(url, href).split("#")[0].split("?")[0]
         p = urlparse(full)
-        if p.netloc == host and pat.search(unquote(p.path)):
+
+        if site == "LUN":
+            allowed_host = p.netloc in ("lun.ua", "www.lun.ua", "apps.lun.ua")
+        else:
+            allowed_host = p.netloc == host
+
+        if allowed_host and pat.search(unquote(p.path)):
             links.append(full)
+
+    # LUN може зберігати URL оголошень не у звичайних <a>,
+    # а всередині JavaScript/JSON сторінки.
+    if site == "LUN":
+        normalized_html = (
+            html.replace("\\/", "/")
+                .replace("\\u002F", "/")
+                .replace("\\u002f", "/")
+                .replace("&", "&")
+        )
+
+        lun_urls = re.findall(
+            r"https?://apps\.lun\.ua/realty/\d+(?:\?[^\"'<>\s\\]*)?",
+            normalized_html,
+            flags=re.I,
+        )
+
+        for lun_url in lun_urls:
+            clean_url = lun_url.split("#")[0].split("?")[0]
+            links.append(clean_url)
+
+        # Запасний пошук лише за ID оголошень.
+        lun_ids = re.findall(
+            r"(?:apps\.lun\.ua/realty/|/realty/)(\d{6,})",
+            normalized_html,
+            flags=re.I,
+        )
+
+        for listing_id in lun_ids:
+            links.append(f"https://apps.lun.ua/realty/{listing\_id}")
+
     return list(dict.fromkeys(links))
+
 
 
 def meta(soup, *names):
