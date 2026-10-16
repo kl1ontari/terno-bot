@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Моніторинг оренди квартир у Тернополі (OLX, DOM.RIA, LUN) -> Telegram.
+"""
+Моніторинг оренди квартир у Тернополі (OLX, DOM.RIA, LUN) -> Telegram.
 
 Запуск: python bot.py          (робочий режим)
         python bot.py --dry    (тест: нічого не надсилає і не зберігає)
@@ -16,11 +17,10 @@ import requests
 from bs4 import BeautifulSoup
 
 # ===================== НАЛАШТУВАННЯ =====================
-# Встав посилання на ВАШ пошук (фільтри виставлені в браузері, сортування "нові спочатку").
 SEARCH_URLS = {
-    "OLX":"https://www.olx.ua/uk/nedvizhimost/kvartiry/dolgosrochnaya-arenda-kvartir/ternopol/?currency=USD&search%5C%5Border%5C%5D=created%5C_at:desc&search%5C%5Bfilter%5C_float%5C_price:to%5C%5D=500&search%5C%5Bfilter%5C_enum%5C_number%5C_of%5C_rooms%5C_string%5C%5D%5C%5B0%5C%5D=odnokomnatnye&search%5C%5Bfilter%5C_enum%5C_number%5C_of%5C_rooms%5C_string%5C%5D%5C%5B1%5C%5D=dvuhkomnatnye",
-    "DOM.RIA": "ВСТАВТЕ_ПОСИЛАННЯ",
-    "LUN": "ВСТАВТЕ_ПОСИЛАННЯ",
+    "OLX": "https://www.olx.ua/uk/nedvizhimost/kvartiry/dolgosrochnaya-arenda-kvartir/ternopol/?currency=USD&search[order]=created_at:desc&search[filter_float_price:to]=500&search[filter_enum_number_of_rooms_string][0]=odnokomnatnye&search[filter_enum_number_of_rooms_string][1]=dvuhkomnatnye",
+    "DOM.RIA": "https://dom.ria.com/uk/arenda-kvartir/ternopol/",
+    "LUN": "https://lun.ua/rent/ternopil/flats",
 }
 MAX_PRICE = 450                # $ включно
 MAX_PRICE_NO_COMMISSION = 500  # $ включно, якщо без комісії
