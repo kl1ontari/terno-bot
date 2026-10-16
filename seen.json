@@ -1,5 +1,29 @@
 {
  "seen": {
+  "lun:154db0d01c42ee62": 1792168109,
+  "lun:09b2f69138243649": 1792168109,
+  "lun:fa68588a75d1c634": 1792168109,
+  "lun:74b68c26886ca52a": 1792168109,
+  "lun:59ee3732ab8cb4f3": 1792168109,
+  "lun:26bd04d686c48f8d": 1792168109,
+  "lun:3164606fa776ca99": 1792168109,
+  "lun:8c0a8960aa108b00": 1792168109,
+  "lun:766e1f9d4e138dab": 1792168109,
+  "lun:4662962fe7e89056": 1792168109,
+  "lun:ca4fa282dea51a70": 1792168109,
+  "lun:76e9172218c0ef08": 1792168109,
+  "lun:1c2ce936fd15e010": 1792168109,
+  "lun:65891b01eac2ab9a": 1792168109,
+  "lun:5e55e21c48a3b69f": 1792168109,
+  "lun:0b2a269ee6f204c5": 1792168109,
+  "lun:f2a643dcd8efe715": 1792168109,
+  "lun:cb84979c92c67f62": 1792168109,
+  "lun:e4199681d63afc85": 1792168109,
+  "lun:c1d6fb6e211f9d2d": 1792168109,
+  "lun:d2ffc40cab492caf": 1792168109,
+  "lun:24e9aa5be0c03db8": 1792168109,
+  "lun:a579ac050252cf6f": 1792168109,
+  "lun:f87cd134793599c1": 1792168109,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-severnyy-smakuly-ulitsa-35039528.html": 1792165372,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-obolonya-chernovetskaya-ulitsa-33867255.html": 1792165372,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-kanada-evgeniya-konovaltsa-ulitsa-35023124.html": 1792161542,
@@ -25,11 +49,12 @@
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tinda-akademika-sergeya-koroleva-ulitsa-35038018.html": 1792161542
  },
  "fails": {
-  "OLX": 3,
+  "OLX": 4,
   "DOM.RIA": 0,
   "LUN": 0
  },
  "sites": [
-  "DOM.RIA"
+  "DOM.RIA",
+  "LUN"
  ]
 }
