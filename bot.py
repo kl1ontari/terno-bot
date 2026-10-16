@@ -5,6 +5,7 @@
 Запуск: python bot.py          (робочий режим)
         python bot.py --dry    (тест: нічого не надсилає і не зберігає)
 """
+import hashlib
 import json
 import os
 import random
@@ -57,6 +58,14 @@ UAH_RE = re.compile(r"(\d[\d\s\u00a0]*)\s*(?:грн|₴|UAH)", re.I)
 CITY_RE = re.compile(r"тернопіл|тернопол", re.I)
 LUN_ID_RE = re.compile(r"(?:apps\.lun\.ua/realty/|/realty/)(\d{6,})", re.I)
 
+# Для розбору карток LUN прямо зі сторінки пошуку
+PRICE_LINE_RE = re.compile(r"^(\d[\d\s\u00a0]{2,})\s*(грн|\$|USD)$", re.I)
+TIME_LINE_RE = re.compile(
+    r"сьогодні|вчора|знайдено|\d{1,2}:\d{2}"
+    r"|\d{1,2}\s+(?:січ|лют|бер|кві|тра|чер|лип|сер|вер|жов|лис|гру)",
+    re.I,
+)
+
 
 def fetch(url):
     r = requests.get(url, headers=HEADERS, timeout=25)
@@ -72,8 +81,8 @@ def usd_rate():
         return float(os.getenv("USD_RATE", "41.5"))
 
 
-def collect_links(site, url):
-    html = fetch(url)
+def collect_links(site, url, html=None):
+    html = html or fetch(url)
     soup = BeautifulSoup(html, "lxml")
     host = urlparse(url).netloc
     pat = re.compile(LINK_PATTERNS[site], re.I)
@@ -90,13 +99,71 @@ def collect_links(site, url):
                     full = "https://apps.lun.ua/realty/" + m.group(1)
             links.append(full)
 
-    # LUN часто тримає посилання на оголошення всередині JSON/JS сторінки
     if site == "LUN":
         norm = html.replace("\\/", "/").replace("\\u002F", "/").replace("\\u002f", "/")
         for lid in LUN_ID_RE.findall(norm):
             links.append("https://apps.lun.ua/realty/" + lid)
 
     return list(dict.fromkeys(links))
+
+
+def text_key(t):
+    return hashlib.md5(re.sub(r"\s+", " ", t).encode("utf-8")).hexdigest()[:16]
+
+
+def lun_cards(html, url, rate):
+    """Розбирає картки оголошень прямо з тексту сторінки пошуку LUN."""
+    soup = BeautifulSoup(html, "lxml")
+    for t in soup(["script", "style", "noscript"]):
+        t.decompose()
+    lines = [l.strip() for l in soup.get_text("\n").split("\n") if l.strip()]
+    starts = [i for i, l in enumerate(lines) if PRICE_LINE_RE.match(l)]
+    cards = []
+    for n, i in enumerate(starts):
+        end = starts[n + 1] if n + 1 < len(starts) else i + 40
+        block = lines[i:end]
+        text = " ".join(block)
+        if not re.search(r"кімнат", text, re.I):
+            continue
+        m = PRICE_LINE_RE.match(block[0])
+        value = num(m.group(1))
+        price = round(value / rate) if m.group(2).lower() == "грн" else value
+        rm = re.search(r"(\d)\s*кімнат", text, re.I)
+        rooms = int(rm.group(1)) if rm else None
+        area = re.search(r"(\d+(?:[.,]\d+)?)\s*/", text)
+        floor = re.search(r"поверх\s*\d+\s*з\s*\d+", text, re.I)
+        address = next(
+            (l for l in block[1:6] if re.search(r"вул|просп|бульв|пров|площ|майдан", l, re.I)), ""
+        )
+        desc = next((l for l in block[1:] if len(l) > 60), "")
+        stable = " ".join(l for l in block if not TIME_LINE_RE.search(l))
+        bits = [
+            f"{rooms}-кімн." if rooms else "",
+            f"{area.group(1)} м²" if area else "",
+            floor.group(0) if floor else "",
+            address,
+        ]
+        cards.append((
+            "lun:" + text_key(stable[:400]),
+            {
+                "url": url,
+                "title": " · ".join(b for b in bits if b) or desc[:80],
+                "desc": desc[:300],
+                "photo": "",
+                "price": price,
+                "rooms": rooms,
+                "no_comm": bool(NO_COMM_RE.search(text)),
+                "bad_repair": bool(BAD_REPAIR_RE.search(text)),
+                "repair": bool(GOOD_REPAIR_RE.search(text)) and not BAD_REPAIR_RE.search(text),
+                "in_city": True,
+            },
+        ))
+    return cards
+
+
+def debug_lun(html):
+    print(f"  LUN debug: розмір сторінки {len(html)} символів, 'грн' трапляється {html.count('грн')} разів")
+    print(f"  LUN debug: приклади посилань з цифрами: {re.findall(r'href=.([^\"]*[0-9]{5,}[^\"]*)', html)[:5]}")
 
 
 def meta(soup, *names):
@@ -139,6 +206,7 @@ def parse(url, rate):
     soup = BeautifulSoup(fetch(url), "lxml")
     title = meta(soup, "og:title") or (soup.title.string.strip() if soup.title and soup.title.string else url)
     desc = meta(soup, "og:description", "description")
+    photo = meta(soup, "og:image", "twitter:image")
     parts = []
     for sel in ('[data-cy="ad_description"]', "#descriptionBlock", '[data-testid="ad-price-container"]'):
         el = soup.select_one(sel)
@@ -151,7 +219,8 @@ def parse(url, rate):
     return {
         "url": url,
         "title": title.strip(),
-        "photo": urljoin(url, meta(soup, "og:image", "twitter:image")) if meta(soup, "og:image", "twitter:image") else "",
+        "desc": "",
+        "photo": urljoin(url, photo) if photo else "",
         "price": find_price([title, desc] + parts + [body[:3000]], rate),
         "rooms": find_rooms(title + " " + desc),
         "no_comm": bool(NO_COMM_RE.search(text)),
@@ -180,13 +249,28 @@ def message(site, it):
     price = f"${it['price']:.0f}" if it["price"] is not None else "ціну не визначено"
     rooms = f" · {it['rooms']}-кімн." if it["rooms"] else ""
     repair = "ремонт: є" if it["repair"] else "ремонт: не вказано"
-    return f"{head} · {site}\n{price}{rooms} · {repair}\n{it['title']}\n{it['url']}"
+    desc = f"\n{it['desc']}" if it.get("desc") else ""
+    return f"{head} · {site}\n{price}{rooms} · {repair}\n{it['title']}{desc}\n{it['url']}"
+
+
+def creds():
+    return os.environ["TELEGRAM_TOKEN"].strip(), os.environ["TELEGRAM_CHAT_ID"].strip()
+
+
+def send(text):
+    token, chat = creds()
+    r = requests.post(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        json={"chat_id": chat, "text": text, "disable_web_page_preview": False},
+        timeout=20,
+    )
+    r.raise_for_status()
 
 
 def send_photo(photo, caption):
     """Надсилає фото з підписом. Якщо фото не вдалося — звичайне повідомлення."""
-    token, chat = os.environ["TELEGRAM_TOKEN"].strip(), os.environ["TELEGRAM_CHAT_ID"].strip()
     if photo:
+        token, chat = creds()
         try:
             r = requests.post(
                 f"https://api.telegram.org/bot{token}/sendPhoto",
@@ -199,16 +283,6 @@ def send_photo(photo, caption):
         except Exception as e:
             print(f"  фото не надіслалось ({e}), шлю текстом")
     send(caption)
-
-
-def send(text):
-    token, chat = os.environ["TELEGRAM_TOKEN"].strip(), os.environ["TELEGRAM_CHAT_ID"].strip()
-    r = requests.post(
-        f"https://api.telegram.org/bot{token}/sendMessage",
-        json={"chat_id": chat, "text": text, "disable_web_page_preview": False},
-        timeout=20,
-    )
-    r.raise_for_status()
 
 
 def load_state():
@@ -241,8 +315,15 @@ def main():
         if not url.startswith("http"):
             print(f"{site}: пропущено (не вказано посилання)")
             continue
+        cards = []
         try:
-            links = collect_links(site, url)
+            html = fetch(url)
+            links = collect_links(site, url, html)
+            if site == "LUN" and not links:
+                cards = lun_cards(html, url, rate)
+                print(f"LUN: прямих посилань немає, карток зі сторінки: {len(cards)}")
+                if not cards:
+                    debug_lun(html)
             state["fails"][site] = 0
         except Exception as e:
             n = state["fails"].get(site, 0) + 1
@@ -254,9 +335,23 @@ def main():
 
         print(f"{site}: знайдено посилань на оголошення: {len(links)}")
         # Сайт, який вперше дав результати, просто запам'ятовуємо без розсилки
-        site_first = first or (links and site not in state["sites"])
-        if links and site not in state["sites"]:
+        has_data = bool(links or cards)
+        site_first = first or (has_data and site not in state["sites"])
+        if has_data and site not in state["sites"]:
             state["sites"].append(site)
+
+        # Картки LUN: уже розібрані, сторінку оголошення відкривати не треба
+        for key, item in cards:
+            if key in state["seen"]:
+                continue
+            if not dry:
+                state["seen"][key] = now
+            if site_first:
+                continue
+            ok, reason = evaluate(item)
+            print(f"  {'+' if ok else '-'} {reason}: {item['title'][:60]}")
+            if ok:
+                queue.append((site, item))
 
         for link in links:
             if link in state["seen"]:
