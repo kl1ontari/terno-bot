@@ -1,5 +1,6 @@
 {
  "seen": {
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-zamkova-ulitsa-35048157.html": 1792172246,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-zagrebellya-zagrebelnaya-ulitsa-34358804.html": 1792170963,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-zbarajskaya-ulitsa-34825543.html": 1792170963,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-bam-kievskaya-ulitsa-35036879.html": 1792170963,
@@ -108,7 +109,7 @@
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tinda-akademika-sergeya-koroleva-ulitsa-35038018.html": 1792161542
  },
  "fails": {
-  "OLX": 8,
+  "OLX": 9,
   "DOM.RIA": 0,
   "LUN": 0
  },
