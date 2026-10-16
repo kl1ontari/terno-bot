@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup
 # ===================== НАЛАШТУВАННЯ =====================
 # Встав посилання на ВАШ пошук (фільтри виставлені в браузері, сортування "нові спочатку").
 SEARCH_URLS = {
-    "OLX": "ВСТАВТЕ_ПОСИЛАННЯ",
+    "OLX":"https://www.olx.ua/uk/nedvizhimost/kvartiry/dolgosrochnaya-arenda-kvartir/ternopol/?currency=USD&search%5C%5Border%5C%5D=created%5C_at:desc&search%5C%5Bfilter%5C_float%5C_price:to%5C%5D=500&search%5C%5Bfilter%5C_enum%5C_number%5C_of%5C_rooms%5C_string%5C%5D%5C%5B0%5C%5D=odnokomnatnye&search%5C%5Bfilter%5C_enum%5C_number%5C_of%5C_rooms%5C_string%5C%5D%5C%5B1%5C%5D=dvuhkomnatnye",
     "DOM.RIA": "ВСТАВТЕ_ПОСИЛАННЯ",
     "LUN": "ВСТАВТЕ_ПОСИЛАННЯ",
 }
