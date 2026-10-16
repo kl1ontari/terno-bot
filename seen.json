@@ -1,5 +1,7 @@
 {
  "seen": {
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-severnyy-smakuly-ulitsa-35039528.html": 1792165372,
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-obolonya-chernovetskaya-ulitsa-33867255.html": 1792165372,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-kanada-evgeniya-konovaltsa-ulitsa-35023124.html": 1792161542,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-gospitalnaya-ulitsa-35039068.html": 1792161542,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-vostochnyy-galitskogo-danila-bulvar-35047273.html": 1792161542,
@@ -23,8 +25,11 @@
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tinda-akademika-sergeya-koroleva-ulitsa-35038018.html": 1792161542
  },
  "fails": {
-  "OLX": 1,
+  "OLX": 2,
   "DOM.RIA": 0,
   "LUN": 0
- }
+ },
+ "sites": [
+  "DOM.RIA"
+ ]
 }
