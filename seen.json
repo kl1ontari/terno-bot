@@ -1,5 +1,9 @@
 {
  "seen": {
+  "lun:1df3626480950ee3": 1792169403,
+  "lun:c736d8207f127936": 1792169403,
+  "lun:84abba157f9ef2ec": 1792169403,
+  "lun:27c5233787b66696": 1792169403,
   "lun:154db0d01c42ee62": 1792168109,
   "lun:09b2f69138243649": 1792168109,
   "lun:fa68588a75d1c634": 1792168109,
@@ -49,7 +53,7 @@
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tinda-akademika-sergeya-koroleva-ulitsa-35038018.html": 1792161542
  },
  "fails": {
-  "OLX": 4,
+  "OLX": 5,
   "DOM.RIA": 0,
   "LUN": 0
  },
