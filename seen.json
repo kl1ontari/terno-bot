@@ -1,5 +1,10 @@
 {
  "seen": {
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-vostochnyy-geroev-krut-ulitsa-35048682.html": 1792230142,
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-bam-zbarajskaya-ulitsa-32518718.html": 1792230142,
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-alyaska-vladimira-velikogo-ulitsa-35048878.html": 1792230142,
+  "lun:f835c84b9e5a6049": 1792230142,
+  "lun:ad5cdd07225fe8e6": 1792230142,
   "lun:69770be53bab6849": 1792215414,
   "lun:64c33703e0c0add0": 1792215414,
   "lun:f603f20e673fa40f": 1792215414,
@@ -157,7 +162,7 @@
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tinda-akademika-sergeya-koroleva-ulitsa-35038018.html": 1792161542
  },
  "fails": {
-  "OLX": 16,
+  "OLX": 17,
   "DOM.RIA": 0,
   "LUN": 0
  },
