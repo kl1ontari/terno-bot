@@ -1,5 +1,11 @@
 {
  "seen": {
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-brodovskaya-ulitsa-35049653.html": 1792254943,
+  "lun:a0dc3a5da982c295": 1792254943,
+  "lun:145cec86778c22a0": 1792254943,
+  "lun:5c2dfcbfe65a1b04": 1792254943,
+  "lun:e607d3a93c34f1fe": 1792254943,
+  "lun:dfd5a9a08368e066": 1792254943,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-mikulinetskaya-ulitsa-35049165.html": 1792237584,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-depovskaya-ulitsa-35049096.html": 1792237584,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-vostochnyy-depovskaya-ulitsa-35048099.html": 1792237584,
@@ -167,7 +173,7 @@
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tinda-akademika-sergeya-koroleva-ulitsa-35038018.html": 1792161542
  },
  "fails": {
-  "OLX": 19,
+  "OLX": 20,
   "DOM.RIA": 0,
   "LUN": 0
  },
