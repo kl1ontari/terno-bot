@@ -1,5 +1,16 @@
 {
  "seen": {
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-drujba-trolleybusnaya-ulitsa-35050587.html": 1792323281,
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-drujba-trolleybusnaya-ulitsa-35050571.html": 1792323281,
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-voinov-divizii-galichina-ulitsa-24345397.html": 1792323281,
+  "lun:8c02ca8f51305fba": 1792323281,
+  "lun:f1070fa3fedb8db9": 1792323281,
+  "lun:72b4d095bb641678": 1792323281,
+  "lun:7d2b5a1c69857a26": 1792323281,
+  "lun:8ce12cf900a8b707": 1792323281,
+  "lun:f592a55d5625fabd": 1792323281,
+  "lun:fce1feeb3c55ebb2": 1792323281,
+  "lun:455b2c367c403364": 1792323281,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-obolonya-torgovitsa-jivova-anatoliya-ulitsa-35049851.html": 1792263067,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-brodovskaya-ulitsa-35049653.html": 1792254943,
   "lun:a0dc3a5da982c295": 1792254943,
@@ -174,7 +185,7 @@
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tinda-akademika-sergeya-koroleva-ulitsa-35038018.html": 1792161542
  },
  "fails": {
-  "OLX": 25,
+  "OLX": 26,
   "DOM.RIA": 0,
   "LUN": 0
  },
