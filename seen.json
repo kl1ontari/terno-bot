@@ -1,5 +1,6 @@
 {
  "seen": {
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-molodejnyy-kulisha-panteleymona-bulvar-35051604.html": 1792354521,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-drujba-mira-ulitsa-35051030.html": 1792335069,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-sheptitskogo-andreya-mitropolita-ulitsa-35050881.html": 1792335069,
   "lun:cf83c5915068416d": 1792335069,
@@ -191,7 +192,7 @@
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tinda-akademika-sergeya-koroleva-ulitsa-35038018.html": 1792161542
  },
  "fails": {
-  "OLX": 28,
+  "OLX": 29,
   "DOM.RIA": 0,
   "LUN": 0
  },
