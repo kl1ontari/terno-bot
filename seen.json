@@ -1,5 +1,11 @@
 {
  "seen": {
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-drujba-mira-ulitsa-35051030.html": 1792335069,
+  "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-sheptitskogo-andreya-mitropolita-ulitsa-35050881.html": 1792335069,
+  "lun:cf83c5915068416d": 1792335069,
+  "lun:1ae38594fbac01e7": 1792335069,
+  "lun:1d08524d5665b768": 1792335069,
+  "lun:e2bf220e5034a279": 1792335069,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-drujba-trolleybusnaya-ulitsa-35050587.html": 1792323281,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-drujba-trolleybusnaya-ulitsa-35050571.html": 1792323281,
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tsentr-voinov-divizii-galichina-ulitsa-24345397.html": 1792323281,
@@ -185,7 +191,7 @@
   "https://dom.ria.com/uk/realty-dolgosrochnaya-arenda-kvartira-ternopol-tinda-akademika-sergeya-koroleva-ulitsa-35038018.html": 1792161542
  },
  "fails": {
-  "OLX": 26,
+  "OLX": 27,
   "DOM.RIA": 0,
   "LUN": 0
  },
